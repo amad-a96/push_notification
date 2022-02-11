@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:push_notify/services/auth_services.dart';
+import 'package:push_notify/services/firebase_manager.dart';
 
 class TokensScreen extends StatefulWidget {
   const TokensScreen({Key? key}) : super(key: key);

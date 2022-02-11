@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:push_notify/model/user.dart';
 
-class FirebaseServices {
+class FirebaseManager {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseMessaging _message = FirebaseMessaging.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
