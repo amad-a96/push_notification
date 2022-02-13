@@ -4,6 +4,10 @@ import 'package:push_notify/model/user.dart';
 import 'package:push_notify/services/firebase_manager.dart';
 import 'dart:convert';
 
+import 'package:push_notify/services/local_notification.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+
 class TokensScreen extends StatefulWidget {
   const TokensScreen({Key? key}) : super(key: key);
 
@@ -13,9 +17,26 @@ class TokensScreen extends StatefulWidget {
 
 class _TokensScreenState extends State<TokensScreen> {
   @override
+  void initState() {
+    tz.initializeTimeZones();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          actions: [
+            ElevatedButton(
+                onPressed: () => NotificationService()
+                    .showNotification(1, 'title', ' body', 5),
+                child: Text("send notif in 5 second")),
+            ElevatedButton(
+                onPressed: () => NotificationService()
+                    .showNotification(2, 'title', ' body', 1),
+                child: Text("send notif now"))
+          ],
+        ),
         body: FutureBuilder<List<ThisUser>>(
             future: FirebaseManager.getToken(),
             builder: (BuildContext context, snapshot) {
