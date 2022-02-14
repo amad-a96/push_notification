@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:push_notify/model/user.dart';
+import 'package:push_notify/screens/sendNotification_screen.dart';
 import 'package:push_notify/services/firebase_manager.dart';
 import 'dart:convert';
 
@@ -22,6 +23,8 @@ class _TokensScreenState extends State<TokensScreen> {
     super.initState();
   }
 
+  List<String> listofTokens = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,22 +40,41 @@ class _TokensScreenState extends State<TokensScreen> {
                 child: Text("send notif now"))
           ],
         ),
-        body: FutureBuilder<List<ThisUser>>(
-            future: FirebaseManager.getToken(),
-            builder: (BuildContext context, snapshot) {
-              if (!snapshot.hasData) {
-                return CircularProgressIndicator();
-              }
+        body: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<List<ThisUser>>(
+                  future: FirebaseManager.getToken(),
+                  builder: (BuildContext context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return CircularProgressIndicator();
+                    }
 
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  ThisUser t = snapshot.data![index];
-                  return tokenCard(t.token);
-                  // getExpenseItems(snapshot);
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        ThisUser t = snapshot.data![index];
+                        listofTokens.add(t.token.toString());
+                        return tokenCard(listofTokens[index]);
+                        // getExpenseItems(snapshot);
+                      },
+                    );
+                  }),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return SendNotificationScreen(
+                        title: "send notification to all",
+                        listofTokens: listofTokens,
+                      );
+                    },
+                  ));
                 },
-              );
-            }));
+                child: Text("send notification"))
+          ],
+        ));
   }
 
   Widget tokenCard(snapshot) {
@@ -60,7 +82,17 @@ class _TokensScreenState extends State<TokensScreen> {
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
           onPressed: () {
-            print(snapshot);
+            final List<String> token = [];
+            token.add(snapshot);
+            print(token);
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return SendNotificationScreen(
+                  title: "send notification to specific device",
+                  listofTokens:token,
+                );
+              },
+            ));
           },
           child: const Text(
             "token",
