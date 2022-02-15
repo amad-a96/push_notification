@@ -7,11 +7,7 @@ class SendNotificationManager {
       {List<String>? tokens,
       String title = '',
       String description = ''}) async {
-    print(tokens!.length);
     for (var item in tokens!) {
-      print("================");
-      print(item);
-      print("================");
       var url = Uri.parse('https://fcm.googleapis.com/fcm/send');
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -19,8 +15,7 @@ class SendNotificationManager {
             "key=AAAAlhPDHBc:APA91bFa6yLwSrFpdnsF4p1ItuS5zlmtcOhXW6I_8My7pCpeLPCECY0mlUrTGCxvRolDnCRF2giVKHPGWTAJzVDJOil4NMppmGCC1KoY68GEvH82ok5XJGG2Bb4Kp4tKy9aorPErAmZk",
       };
       final body = jsonEncode({
-        "to":item
-           ,
+        "to": item,
         "notification": {
           "title": title,
           "body": description,
@@ -29,7 +24,9 @@ class SendNotificationManager {
         },
         "data": {
           "url": "<url of media image>",
-          "dl": "<deeplink action on tap of notification>"
+          "dl": "<deeplink action on tap of notification>",
+         "click_action": "FLUTTER_NOTIFICATION_CLICK",
+         "screen": "MyScreen",
         }
       });
       await http

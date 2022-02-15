@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:push_notify/model/user.dart';
 import 'package:push_notify/screens/sendNotification_screen.dart';
 import 'package:push_notify/services/firebase_manager.dart';
 import 'dart:convert';
 
+import 'package:push_notify/services/local_notification.dart';
 import 'package:push_notify/services/local_notification.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -17,9 +19,35 @@ class TokensScreen extends StatefulWidget {
 }
 
 class _TokensScreenState extends State<TokensScreen> {
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    final screen = message.data['screen'];
+    Navigator.pushNamed(
+      context,
+      '/${screen}',
+    );
+  }
+
   @override
   void initState() {
     tz.initializeTimeZones();
+    setupInteractedMessage();
     super.initState();
   }
 
@@ -36,7 +64,7 @@ class _TokensScreenState extends State<TokensScreen> {
                 child: Text("send notif in 5 second")),
             ElevatedButton(
                 onPressed: () => NotificationService()
-                    .showNotification(2, 'title', ' body', 1),
+                    .showNotificationNow(2, 'title', 'body'),
                 child: Text("send notif now"))
           ],
         ),
@@ -89,7 +117,7 @@ class _TokensScreenState extends State<TokensScreen> {
               builder: (context) {
                 return SendNotificationScreen(
                   title: "send notification to specific device",
-                  listofTokens:token,
+                  listofTokens: token,
                 );
               },
             ));
